@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <title>Векторлық және Растрлық графика - Арқан тартыс</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 750px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        h1 { margin-bottom: 5px; color: #facc15; }
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            outline: none;
+            text-align: center;
+        }
+        .btn {
+            background-color: #facc15;
+            color: #0f172a;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn:hover { background-color: #eab308; transform: scale(1.03); }
+        
+        /* Арқан тартыс аймағы */
+        .tug-field {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .teams-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .rope-track {
+            height: 16px;
+            background: #475569;
+            border-radius: 8px;
+            position: relative;
+            margin: 15px 0;
+        }
+        .rope-knot {
+            width: 30px;
+            height: 30px;
+            background: #ef4444;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: left 0.5s ease-in-out;
+            box-shadow: 0 0 10px #ef4444;
+        }
+        
+        /* Сұрақ карточкасы */
+        .question-box {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .option-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        .option-btn:hover { background: rgba(255, 255, 255, 0.3); }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 1-КЕЗЕҢ: Кіру -->
+        <div id="screen-name">
+            <h1>🪢 «Арқан тартыс»: Графика таңдары</h1>
+            <p>Растрлық және векторлық графиканың артықшылықтары мен кемшіліктерін бағалап, командаңды жеңіске жеткіз!</p>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+            <h3>👨‍🎓 Оқушының аты-жөні:</h3>
+            <input type="text" id="studentNameInput" placeholder="Аты-жөніңізді жазыңыз...">
+            <br>
+            <button class="btn" onclick="startGame()">🎮 Жарысты бастау</button>
+        </div>
+
+        <!-- 2-КЕЗЕҢ: Ойын барысы -->
+        <div id="screen-game" class="hidden">
+            <div class="info-bar">
+                <span id="studentDisplay"></span>
+                <span id="scoreDisplay">Ұпай: 0 / 10</span>
+            </div>
+            
+            <!-- Интерактивті Арқан тартыс экраны -->
+            <div class="tug-field">
+                <div class="teams-container">
+                    <div>🔵 <b>Сіз</b></div>
+                    <div style="font-size: 14px; color: #cbd5e1;" id="progressTitle">Сұрақ 1 / 10</div>
+                    <div>🔴 <b>Қарсылас</b></div>
+                </div>
+                <div class="rope-track">
+                    <div class="rope-knot" id="ropeKnot"></div>
+                </div>
+            </div>
+
+            <div class="question-box" id="questionText">
+                Сұрақ жүктелуде...
+            </div>
+
+            <div class="options-grid" id="optionsContainer">
+                <!-- Жауап нұсқалары -->
+            </div>
+        </div>
+
+        <!-- 3-КЕЗЕҢ: Нәтиже -->
+        <div id="screen-result" class="hidden">
+            <h1>🏆 Жарыс аяқталды!</h1>
+            <p id="resultStudent" style="font-size: 18px; font-weight: bold;"></p>
+            <div id="finalScoreText" style="font-size: 26px; font-weight: bold; color: #facc15; margin: 20px 0;"></div>
+            <p id="feedbackText" style="font-size: 16px; margin-bottom: 20px;"></p>
+            <button class="btn" onclick="restartGame()">🔄 Қайтадан жарысу</button>
+        </div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {
+                q: "1. Кескінді масштаптағанда (үлкейткенде) сапасы мүлде бұзылмайтын графика түрі қайсысы?",
+                options: ["Растрлық графика", "Векторлық графика", "Екеуінің де сапасы бұзылады", "Үлкейтуге болмайды"],
+                answer: 1
+            },
+            {
+                q: "2. Растрлық кескіннің ең кіші негізгі элементі не болып табылады?",
+                options: ["Сызық (вектор)", "Пиксель", "Геометриялық фигура", "Формула"],
+                answer: 1
+            },
+            {
+                q: "3. Кескін өлшемін үлкейткенде пиксельдері көрініп, сапасы төмендейтін графика қайсысы?",
+                options: ["Векторлық графика", "Растрлық графика", "Үшөлшемді графика", "Ешқайсысы"],
+                answer: 1
+            },
+            {
+                q: "4. Векторлық кескіндерді сипаттау үшін не қолданылады?",
+                options: ["Тек пиксель торлары", "Математикалық формулалар мен фигуралар", "Дыбыстық толқындар", "Мәтіндік файлдар"],
+                answer: 1
+            },
+            {
+                q: "5. Шынайы фотосуреттер мен күрделі түсті суреттерді сақтауға қай графика тиімдірек?",
+                options: ["Растрлық графика", "Векторлық графика", "Сызбалық графика", "Екеуі де бірдей"],
+                answer: 0
+            },
+            {
+                q: "6. Логотиптер, белгішелер (иконкалар) және сызбалар жасау үшін қай графика түрі жиі қолданылады?",
+                options: ["Растрлық графика", "Векторлық графика", "Анимациялық файлдар", "3D модельдеу"],
+                answer: 1
+            },
+            {
+                q: "7. Проблема: Файл көлемі өте үлкен болып кетеді және сапасы пиксельге тәуелді. Бұл кай графиканың кемшілігі?",
+                options: ["Векторлық графика", "Растрлық графика", "Интерактивті графика", "Кодтық графика"],
+                answer: 1
+            },
+            {
+                q: "8. Растрлық графикалық редакторға қай бағдарлама жатады?",
+                options: ["Inkscape", "Paint / Adobe Photoshop", "CorelDRAW", "AutoCAD"],
+                answer: 1
+            },
+            {
+                q: "9. Векторлық графикалық редакторды таңдаңыз:",
+                options: ["MS Paint", "Inkscape / CorelDRAW", "Adobe Lightroom", "Snipping Tool"],
+                answer: 1
+            },
+            {
+                q: "10. Векторлық кескінді сақтаудың негізгі артықшылығы неде?",
+                options: ["Шынайы фотосуретті дәл береді", "Кез келген өлшемде сапасын жоғалтпайды және дискіде аз орын алады", "Пиксельдер саны өте көп болады", "Тек ақ-қара түсті болады"],
+                answer: 1
+            }
+        ];
+
+        let studentName = "";
+        let currentIndex = 0;
+        let score = 0;
+        let knotPosition = 50; // Топтың арқан орны (пайызбен)
+
+        function startGame() {
+            const input = document.getElementById("studentNameInput");
+            if (input.value.trim() === "") {
+                alert("⚠️ Өтініш, аты-жөніңізді енгізіңіз!");
+                return;
+            }
+            studentName = input.value.trim();
+            document.getElementById("studentDisplay").innerText = "👤 " + studentName;
+            document.getElementById("screen-name").classList.add("hidden");
+            document.getElementById("screen-game").classList.remove("hidden");
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIndex < questionsData.length) {
+                const current = questionsData[currentIndex];
+                document.getElementById("progressTitle").innerText = `Сұрақ ${currentIndex + 1} / ${questionsData.length}`;
+                document.getElementById("questionText").innerText = current.q;
+                document.getElementById("scoreDisplay").innerText = `Ұпай: ${score} / 10`;
+
+                const container = document.getElementById("optionsContainer");
+                container.innerHTML = "";
+
+                current.options.forEach((opt, idx) => {
+                    let btn = document.createElement("button");
+                    btn.className = "option-btn";
+                    btn.innerText = opt;
+                    btn.onclick = () => checkAnswer(idx);
+                    container.appendChild(btn);
+                });
+            } else {
+                showResult();
+            }
+        }
+
+        function checkAnswer(selectedIndex) {
+            const current = questionsData[currentIndex];
+            const knot = document.getElementById("ropeKnot");
+
+            if (selectedIndex === current.answer) {
+                score += 1;
+                knotPosition -= 4; // Дұрыс жауап берсе, арқан солға (оқушы жаққа) тартылады
+                alert("✅ Дұрыс! Сіздің команда арқанды өзіне тартып, +1 ұпай жинады!");
+            } else {
+                knotPosition += 4; // Қате болса, арқан оңға (қарсыласқа) өтеді
+                alert(`❌ Қате! Дұрыс жауап: ${current.options[current.answer]}`);
+            }
+
+            knot.style.left = knotPosition + "%";
+            currentIndex++;
+            loadQuestion();
+        }
+
+        function showResult() {
+            document.getElementById("screen-game").classList.add("hidden");
+            document.getElementById("screen-result").classList.remove("hidden");
+            document.getElementById("resultStudent").innerText = "Оқушы: " + studentName;
+            document.getElementById("finalScoreText").innerText = `Жалпы нәтиже: ${score} / 10 ұпай`;
+            
+            let feedback = "";
+            if (score >= 8) {
+                feedback = "🏆 Тамаша жеңіс! Сіз растрлық және векторлық графиканың айырмашылықтарын өте керемет бағалай білесіз!";
+            } else if (score >= 5) {
+                feedback = "👍 Жақсы тартыс болды! Графика түрлерінің негізгі артықшылықтарын білесіз.";
+            } else {
+                feedback = "📚 Қарсылас команда басым түсті. Графика тақырыбын қайта қарап шығу ұсынылады.";
+            }
+            document.getElementById("feedbackText").innerText = feedback;
+        }
+
+        function restartGame() {
+            studentName = "";
+            currentIndex = 0;
+            score = 0;
+            knotPosition = 50;
+            document.getElementById("ropeKnot").style.left = "50%";
+            document.getElementById("studentNameInput").value = "";
+            document.getElementById("screen-result").classList.add("hidden");
+            document.getElementById("screen-name").classList.remove("hidden");
+        }
+    </script>
+</body>
+</html>
